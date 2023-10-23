@@ -16,7 +16,7 @@ public class Utils {
         return myString.toString();
     }
 
-    public static void showArray(int[] arr) {
+    public static String arrayFormatedString(int[] arr) {
         StringBuilder index = new StringBuilder();
         StringBuilder values = new StringBuilder();
         for (int i =0; i< arr.length; i++) {
@@ -28,18 +28,23 @@ public class Utils {
         }
         index.append("|%n");
         values.append("|%n");
-        String line = repeatCharacter('-', index.length()-2);
-        System.out.println(line);
-        System.out.printf(""+ index);
-        System.out.println(line);
-        System.out.printf(""+ values);
-        System.out.println(line);
+        String line = repeatCharacter('-', index.length()-2)+"%n";
+
+        String result =line + index.toString()+line+values.toString()+line;
+        return result;
     }
 
 
     public static void showStep(int[] arr, int step) {
         System.out.println("step "+step+": ");
-        showArray(arr);
+        System.out.printf(Utils.arrayFormatedString(arr));
+    }
+
+    public static String showStep2(int[] arr, int step) {
+        StringBuilder str = new StringBuilder();
+        str.append("Step "+step+":%n");
+        str.append(arrayFormatedString(arr));
+        return str.toString();
     }
 
 

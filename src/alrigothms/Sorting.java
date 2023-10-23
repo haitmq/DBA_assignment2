@@ -1,5 +1,8 @@
 package alrigothms;
 
+import file_service.FileService;
+import utils.Utils;
+
 import java.util.Random;
 import static utils.Utils.*;
 
@@ -16,8 +19,9 @@ public class Sorting {
 
     // Buble Sort
     public static void bubleSort(int[] arr) {
-        System.out.println("Original array:");
-        showArray(arr);
+        StringBuilder output = new StringBuilder();
+        output.append("Original array:%n");
+        output.append(Utils.arrayFormatedString(arr));
         int step = 1;
         boolean swaped = true;
         for (int i =0; i< arr.length; i++) {
@@ -28,62 +32,58 @@ public class Sorting {
                     swaped = true;
                 }
             }
+            output.append(Utils.showStep2(arr, step));
+            step++;
             if (swaped == false) {
                 break;
             }
-            showStep(arr, step);
-            step++;
+
         }
+        FileService.writeFile2(FileService.BUBBLE_SORT_OUTPUT, output.toString());
     }
 
     // Selection Sort
     public static void selectionSort(int[] arr) {
-        System.out.println("Original array:");
-        showArray(arr);
+        StringBuilder output = new StringBuilder();
+        output.append("Original array:%n");
+        output.append(Utils.arrayFormatedString(arr));
         int step = 1;
         for(int i = 0; i < arr.length-1; i++) {
             int mId = i;
-//            boolean changed = false;
             for(int j = i+1;j< arr.length; j++) {
                 if(arr[j]<arr[mId]) {
                     mId =j;
-//                    changed = true;
                 }
             }
             swap(arr, mId, i);
-//            if (changed == true) {
-//                showStep(arr, step);
-//                step++;
-//            }
-            showStep(arr, step);
+            output.append(Utils.showStep2(arr, step));
             step++;
         }
+        FileService.writeFile2(FileService.SELECTION_SORT_OUTPUT, output.toString());
     }
 
     // Insert Sort
     public static void insertSort(int[] arr) {
-        System.out.println("Original array:");
-        showArray(arr);
+        StringBuilder output = new StringBuilder();
+        output.append("Original array:%n");
+        output.append(Utils.arrayFormatedString(arr));
         int step = 1;
         for(int i  =1; i< arr.length; i++) {
             int j = i;
-//            boolean changed = false;
             while(j>0) {
                 if(arr[j]< arr[j-1]) {
                     swap(arr, j, j-1);
                     j--;
-//                    changed = true;
                 } else {
                     break;
                 }
             }
-//            if(changed== true) {
-//                showStep(arr, step);
-//                step++;
-//            }
-            showStep(arr, step);
+
+//            showStep(arr, step);
+            output.append(Utils.showStep2(arr, step));
             step++;
         }
+        FileService.writeFile2(FileService.INSERTION_SORT_OUTPUT, output.toString());
     }
 
     // Merge Sort

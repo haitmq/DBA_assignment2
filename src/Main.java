@@ -1,3 +1,4 @@
+import java.io.File;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -5,23 +6,30 @@ import alrigothms.Searching;
 import file_service.FileService;
 import utils.Utils;
 
-import javax.swing.*;
-
 public class Main {
     // file path: files/INPUT.TXT
 
     private static final Scanner scanner = new Scanner(System.in);
+    // Biến isFresh là để kiểm tra xem người dùng đã nhập 1 array nào chưa
     private static boolean isFresh = true;
 
     public static void main(String[] args) {
         mainProgram();
     }
 
+    // Chương trình chính
     public static void mainProgram() {
+        // Khi khởi động chương trình xóa dữ liệu ở file ARRAY_SAVE.TXT
         FileService.clearDatas(FileService.SAVE_FILE);
         while(true) {
             menuTable();
+            // Kiểm tra function người dùng chọn hợp lệ
             int functionChoose = validFunctionInput(8);
+            // Nếu ban đầu chưa nhập mảng thì hiển thị thông báo
+            if(isFresh&&functionChoose>2) {
+                System.out.println("Current array is unavailable. Please enter an array");
+                continue;
+            }
             switch (functionChoose) {
                 case 0:
                     System.out.println("Thanks for using the program!!!");
@@ -33,58 +41,34 @@ public class Main {
                     fileInput();
                     break;
                 case 3:
-                    if(isFresh) {
-                        System.out.println("Current array is unavailable. Please enter an array");
-                    } else {
-                        showCurrentArray();
-                    }
+                    showCurrentArray();
                     break;
                 case 4:
-                    if(isFresh) {
-                        System.out.println("Current array is unavailable. Please enter an array");
-                    } else {
-                        bubbleSort();
-                    }
+                    bubbleSort();
                     break;
                 case 5:
-                    if(isFresh) {
-                        System.out.println("Current array is unavailable. Please enter an array");
-                    } else {
-                        selectionSort();
-                    }
+                    selectionSort();
                     break;
                 case 6:
-                    if(isFresh) {
-                        System.out.println("Current array is unavailable. Please enter an array");
-                    } else {
-                        insertionSort();
-                    }
+                    insertionSort();
                     break;
                 case 7:
-                    if(isFresh) {
-                        System.out.println("Current array is unavailable. Please enter an array");
-                    } else {
-                        linearSearch();
-                    }
+                    linearSearch();
                     break;
                 case 8:
-                    if(isFresh) {
-                        System.out.println("Current array is unavailable. Please enter an array");
-                    } else {
-                        binarySearch();
-                    }
+                    binarySearch();
                     break;
             }
         }
     }
 
+    // Menu chức năng
     public static void menuTable() {
-
         final String ROWLINE = "+--------+-------------+--------+%n";
         int ROWLINELength = ROWLINE.length();
         String placeHolderStr = "| %-"+ (ROWLINELength-6) +"s |%n";
         System.out.format(ROWLINE);
-        System.out.format(placeHolderStr, "MENU");
+        System.out.format("| %"+ ((ROWLINELength-6)/2) +"s |%n", "MENU");
         System.out.format(ROWLINE);
         System.out.format(placeHolderStr, "1. Manual input");
         System.out.format(placeHolderStr, "2. File input");
@@ -118,17 +102,24 @@ public class Main {
         }
     }
 
+    // Chức năng 1: Nhập mảng thủ công
     public static void manualInput() {
+        /*Kiểm tra xem đã tồn tại mảng trong file save chưa
+        nếu chưa hoặc nhập lần đầu thì nhập mảng
+        nếu không hỏi nguoời dùng có muốn xóa mảng hiện tại để nhập mảng mới không
+         */
         if(enterNewArrCheck() || isFresh){
             while(true) {
                 try {
                     System.out.print("Enter the array length: ");
+                    // kiểm tra dữ liệu người dùng nhập: (độ dài mảng)
                     String intput = scanner.nextLine();
                     int len = Integer.parseInt(intput);
                     if(len<=0 || len>20) {
                         throw new NumberFormatException();
                     }
-                    boolean isValidinput = false;
+                    // Kiểm tra dữ liệu người dùng nhập: (giá trị các phần tử của mảng)
+                    boolean isValidinput = false; //flag
                     while(!isValidinput) {
                         int[] arr = new int[len];
                         System.out.println("Enter elements:");
@@ -137,6 +128,7 @@ public class Main {
                                 arr[i] = scanner.nextInt();
                                 isValidinput = true;
                             } catch (InputMismatchException e) {
+                                // bắt lỗi input người dùng và yêu cầu nhập lại
                                 System.out.println("Value of elements must be a Integer.");
                                 System.out.println("Please enter again.");
                                 isValidinput = false;
@@ -144,10 +136,11 @@ public class Main {
                             }
                         }
                         scanner.nextLine();
+                        // Nếu dữ liệu hợp lệ, xóa mảng trước đó, lưu mảng nguời dùng nhập vào file save
                         if(isValidinput){
                             FileService.clearDatas(FileService.SAVE_FILE);
                             FileService.writeFile(FileService.SAVE_FILE, Utils.formatArraySave(arr));
-                            Utils.showArray(arr);
+                            System.out.printf(Utils.arrayFormatedString(arr));
                             isFresh = false;
                             return;
                         }
@@ -161,18 +154,20 @@ public class Main {
         }
 
     }
-
+    // Chức năng 2: nhập mảng thông qua đường dẫn
     public static void fileInput() {
+        // Kiểm tra tương tự chức năng 1
         if(enterNewArrCheck() || isFresh) {
             while(true) {
                 System.out.print("Enter file path: ");
                 String path = scanner.nextLine();
+                //Kiểm tra xem file có tồn tại hay không
                 if(FileService.isFileExisted(path)){
                     int[] arr = FileService.readFile(path);
                     if(arr != null) {
                         FileService.clearDatas(FileService.SAVE_FILE);
                         FileService.writeFile(FileService.SAVE_FILE, Utils.formatArraySave(arr));
-                        Utils.showArray(arr);
+                        System.out.printf(Utils.arrayFormatedString(arr));
                         isFresh = false;
                         return;
                     } else {
@@ -189,22 +184,25 @@ public class Main {
 
     public static void showCurrentArray(){
         int[] arr = FileService.readFile(FileService.SAVE_FILE);
-        Utils.showArray(arr);
+        System.out.printf(Utils.arrayFormatedString(arr));
     }
 
     public static void bubbleSort() {
         int[] arr = FileService.readFile(FileService.SAVE_FILE);
         alrigothms.Sorting.bubleSort(arr);
+        System.out.printf(FileService.readFile2(FileService.BUBBLE_SORT_OUTPUT));
     }
 
     public static void selectionSort(){
         int[] arr = FileService.readFile(FileService.SAVE_FILE);
         alrigothms.Sorting.selectionSort(arr);
+        System.out.printf(FileService.readFile2(FileService.SELECTION_SORT_OUTPUT));
     }
 
     public static void insertionSort(){
         int[] arr = FileService.readFile(FileService.SAVE_FILE);
         alrigothms.Sorting.insertSort(arr);
+        System.out.printf(FileService.readFile2(FileService.INSERTION_SORT_OUTPUT));
     }
 
     public static void linearSearch() {

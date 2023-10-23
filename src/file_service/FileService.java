@@ -41,6 +41,35 @@ public class FileService {
             e.printStackTrace();
         }
     }
+    public static String readFile2(String fileName) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
+            StringBuilder str = new StringBuilder();
+            String line;
+            while((line = reader.readLine())!=null){
+                str.append(line);
+                str.append("%n");
+            }
+            return str.toString();
+        } catch (IOException e) {
+            System.out.println("Error when reading file or file does not exist");
+        } catch (NumberFormatException e) {
+            System.out.println("Datas are invalid!!!");
+        }
+        return null;
+    }
+
+    public static void writeFile2(String filenPath, String content) {
+        tryCreateSaveFile(filenPath);
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filenPath))) {
+            String[] lines = content.split("%n");
+            for(String line: lines){
+                writer.write(line);
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public static void clearDatas(String fileName) {
         tryCreateSaveFile(fileName);
@@ -70,7 +99,7 @@ public class FileService {
         if (file.exists()) {
             return true;
         }
-        System.out.println("ERROR: File not Found");
+//        System.out.println("ERROR: File not Found");
         return false;
     }
 
@@ -78,6 +107,7 @@ public class FileService {
         if(isFileExisted(fileName)){
             try(BufferedReader buffer = new BufferedReader(new FileReader(fileName))){
                 if(buffer.readLine() == null) {
+                    System.out.println("The file is empty");
                     return true;
                 }
             } catch (IOException e) {
