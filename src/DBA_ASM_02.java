@@ -1,17 +1,19 @@
-import java.io.File;
+import java.util.Arrays;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-import alrigothms.Searching;
+import algorithms.Searching;
+import algorithms.Sorting;
 import file_service.FileService;
 import utils.Utils;
 
-public class Main {
+public class DBA_ASM_02 {
     // file path: files/INPUT.TXT
 
     private static final Scanner scanner = new Scanner(System.in);
     // Biến isFresh là để kiểm tra xem người dùng đã nhập 1 array nào chưa
     private static boolean isFresh = true;
+    public static int[] CurrentArr;
 
     public static void main(String[] args) {
         mainProgram();
@@ -29,6 +31,13 @@ public class Main {
             if(isFresh&&functionChoose>2) {
                 System.out.println("Current array is unavailable. Please enter an array");
                 continue;
+            } else if(isFresh==false) {
+                CurrentArr =
+                        Utils.changeStrToIntArr(
+                                FileService.readFile(
+                                        FileService.SAVE_FILE, true
+                                ), " "
+                        );
             }
             switch (functionChoose) {
                 case 0:
@@ -68,7 +77,7 @@ public class Main {
         int ROWLINELength = ROWLINE.length();
         String placeHolderStr = "| %-"+ (ROWLINELength-6) +"s |%n";
         System.out.format(ROWLINE);
-        System.out.format("| %"+ ((ROWLINELength-6)/2) +"s |%n", "MENU");
+        System.out.format("| %"+ ((ROWLINELength-2)/2) +"s %"+((ROWLINELength-10)/2) +"s |%n", "MENU","");
         System.out.format(ROWLINE);
         System.out.format(placeHolderStr, "1. Manual input");
         System.out.format(placeHolderStr, "2. File input");
@@ -122,7 +131,7 @@ public class Main {
                     boolean isValidinput = false; //flag
                     while(!isValidinput) {
                         int[] arr = new int[len];
-                        System.out.println("Enter elements:");
+                        System.out.println("Enter elements (ex: 9 3 5 for an array has length 3):");
                         for(int i =0; i< len;i++) {
                             try{
                                 arr[i] = scanner.nextInt();
@@ -156,14 +165,16 @@ public class Main {
     }
     // Chức năng 2: nhập mảng thông qua đường dẫn
     public static void fileInput() {
+        System.out.println("NOTE: The file must be in 'files' folder of the Project.");
         // Kiểm tra tương tự chức năng 1
         if(enterNewArrCheck() || isFresh) {
             while(true) {
                 System.out.print("Enter file path: ");
-                String path = scanner.nextLine();
+                String path = Utils.handleFilePathInput(scanner.nextLine());
                 //Kiểm tra xem file có tồn tại hay không
                 if(FileService.isFileExisted(path)){
-                    int[] arr = FileService.readFile(path);
+                    String datas = FileService.readFile(path, true);
+                    int[] arr = Utils.changeStrToIntArr(datas.trim(), " ");
                     if(arr != null) {
                         FileService.clearDatas(FileService.SAVE_FILE);
                         FileService.writeFile(FileService.SAVE_FILE, Utils.formatArraySave(arr));
@@ -183,26 +194,23 @@ public class Main {
     }
 
     public static void showCurrentArray(){
-        int[] arr = FileService.readFile(FileService.SAVE_FILE);
-        System.out.printf(Utils.arrayFormatedString(arr));
+        System.out.printf(Utils.arrayFormatedString(CurrentArr));
     }
 
     public static void bubbleSort() {
-        int[] arr = FileService.readFile(FileService.SAVE_FILE);
-        alrigothms.Sorting.bubleSort(arr);
-        System.out.printf(FileService.readFile2(FileService.BUBBLE_SORT_OUTPUT));
+        algorithms.Sorting.bubleSort(CurrentArr);
+        System.out.printf(FileService.readFile(FileService.BUBBLE_SORT_OUTPUT, false));
     }
 
     public static void selectionSort(){
-        int[] arr = FileService.readFile(FileService.SAVE_FILE);
-        alrigothms.Sorting.selectionSort(arr);
-        System.out.printf(FileService.readFile2(FileService.SELECTION_SORT_OUTPUT));
+
+        algorithms.Sorting.selectionSort(CurrentArr);
+        System.out.printf(FileService.readFile(FileService.SELECTION_SORT_OUTPUT, false));
     }
 
     public static void insertionSort(){
-        int[] arr = FileService.readFile(FileService.SAVE_FILE);
-        alrigothms.Sorting.insertSort(arr);
-        System.out.printf(FileService.readFile2(FileService.INSERTION_SORT_OUTPUT));
+        algorithms.Sorting.insertSort(CurrentArr);
+        System.out.printf(FileService.readFile(FileService.INSERTION_SORT_OUTPUT, false));
     }
 
     public static void linearSearch() {
@@ -211,13 +219,20 @@ public class Main {
             String input = scanner.nextLine();
             try{
                 int value = Integer.parseInt(input);
-                int[] result = Searching.linearSearch(FileService.readFile(FileService.SAVE_FILE), value);
+                int[] result = Searching.linearSearch(CurrentArr, value);
                 if(result!=null) {
                     System.out.print("The Larger position: ");
                     for(int i =0; i< result.length; i++) {
                         System.out.print(result[i]+" ");
                     }
                     System.out.println();
+                    int[][] rArr = new int[result.length][2];
+                    for(int i =0; i< result.length; i++) {
+                        rArr[i][0]= result[i];
+                        rArr[i][1]= CurrentArr[result[i]];
+                    }
+                    System.out.printf(Utils.arrayFormatedString2(rArr));
+
                 } else {
                     System.out.println("The value does not exist!");
                 }
@@ -234,10 +249,11 @@ public class Main {
             String input = scanner.nextLine();
             try{
                 int value = Integer.parseInt(input);
-                int[] arr = FileService.readFile(FileService.SAVE_FILE);
-                int result = Searching.binarySearch(FileService.readFile(FileService.SAVE_FILE), 0, arr.length-1, value);
+                int[] arr = Arrays.copyOf(CurrentArr, CurrentArr.length);
+                Sorting.quickSort(arr, 0, arr.length-1);
+                int result = Searching.binarySearch(arr, 0, arr.length-1, value);
                 if(result!=-1) {
-                    System.out.print("The right position: " + result);
+                    System.out.println("The right position: " + result);
                 } else {
                     System.out.println("The value does not exist!");
                 }
@@ -249,20 +265,20 @@ public class Main {
     }
 
 
-    public static void setInitial() {
-        FileService.clearDatas(FileService.SAVE_FILE);
-        FileService.clearDatas(FileService.BUBBLE_SORT_OUTPUT);
-        FileService.clearDatas(FileService.SELECTION_SORT_OUTPUT);
-        FileService.clearDatas(FileService.INSERTION_SORT_OUTPUT);
-    }
 
     public static boolean enterNewArrCheck() {
         if(isFresh == false) {
             System.out.println("New array will override the current array.");
-            System.out.println("Are you sure want to enter new array?(Y/N)");
-            String createNew = scanner.nextLine().toLowerCase();
-            if(createNew.equals("y") || createNew.equals("yes")) {
-                return true;
+            System.out.println("Are you sure want to enter a new array?(Y/N)");
+            while(true) {
+                String createNew = scanner.nextLine();
+                if(createNew.toLowerCase().equals("y") || createNew.toLowerCase().equals("yes")) {
+                    return true;
+                } else if (createNew.toLowerCase().equals("n") || createNew.toLowerCase().equals("no")) {
+                    break;
+                } else {
+                    System.out.println("Please enter again.");
+                }
             }
         }
         return false;

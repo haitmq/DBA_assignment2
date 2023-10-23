@@ -1,15 +1,13 @@
-package alrigothms;
+package algorithms;
 
 import file_service.FileService;
 import utils.Utils;
 
 import java.util.Random;
-import static utils.Utils.*;
 
 public class Sorting {
     public static Random rn = new Random();
 
-    public static int step = 1;
 
     public static void swap(int[] arr, int k, int l) {
         int temp = arr[k];
@@ -32,14 +30,14 @@ public class Sorting {
                     swaped = true;
                 }
             }
-            output.append(Utils.showStep2(arr, step));
+            output.append(Utils.showStep(arr, step));
             step++;
             if (swaped == false) {
                 break;
             }
 
         }
-        FileService.writeFile2(FileService.BUBBLE_SORT_OUTPUT, output.toString());
+        FileService.writeFile(FileService.BUBBLE_SORT_OUTPUT, output.toString());
     }
 
     // Selection Sort
@@ -56,10 +54,10 @@ public class Sorting {
                 }
             }
             swap(arr, mId, i);
-            output.append(Utils.showStep2(arr, step));
+            output.append(Utils.showStep(arr, step));
             step++;
         }
-        FileService.writeFile2(FileService.SELECTION_SORT_OUTPUT, output.toString());
+        FileService.writeFile(FileService.SELECTION_SORT_OUTPUT, output.toString());
     }
 
     // Insert Sort
@@ -80,10 +78,10 @@ public class Sorting {
             }
 
 //            showStep(arr, step);
-            output.append(Utils.showStep2(arr, step));
+            output.append(Utils.showStep(arr, step));
             step++;
         }
-        FileService.writeFile2(FileService.INSERTION_SORT_OUTPUT, output.toString());
+        FileService.writeFile(FileService.INSERTION_SORT_OUTPUT, output.toString());
     }
 
     // Merge Sort
